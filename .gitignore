@@ -1,0 +1,4 @@
+# custom
+ignore/*
+training/data/
+__pycache__/
