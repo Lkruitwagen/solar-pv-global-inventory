@@ -1,0 +1,9 @@
+geojson==2.5.0
+matplotlib==3.2.0
+shapely==1.7.0
+pillow==7.0.0
+descarteslabs==1.1.2
+area==1.1.1
+pyproj==2.5.0
+tensorflow==2.1.0
+keras=2.3.1
