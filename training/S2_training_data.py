@@ -181,9 +181,9 @@ class MakeS2TrainingData:
 if __name__ == "__main__":
 
     trn_data = MakeS2TrainingData()
-    #shuffle(trn_data.trn_dltiles)
-    #for ii_t, tt in enumerate(trn_data.trn_dltiles[0:101]):
-    #    trn_data.annotation_from_tile(tt['properties']['key'],ii_t)
+    shuffle(trn_data.trn_dltiles)
+    for ii_t, tt in enumerate(trn_data.trn_dltiles[0:101]):
+        trn_data.annotation_from_tile(tt['properties']['key'],ii_t)
 
     trn_data.make_records(os.path.join(os.getcwd(),'data','S2_unet'))
 
