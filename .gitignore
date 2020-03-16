@@ -3,3 +3,4 @@ ignore/*
 training/data/
 __pycache__/
 data/*
+*.h5
