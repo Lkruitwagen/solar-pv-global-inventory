@@ -1,4 +1,4 @@
-def predict_1(dltile, src_product_id, dest_product_id, fc_id, year, quarter_s, quarter_e, run_ii):
+def S2Infer1(dltile, src_product_id, dest_product_id, fc_id, sdate,edate, run_ii):
     import tensorflow as tf
     import numpy as np
     import keras, json, time, datetime, pyproj
@@ -86,7 +86,7 @@ def predict_1(dltile, src_product_id, dest_product_id, fc_id, year, quarter_s, q
 
     #fetch the scene metadata
 
-    scenes = metadata_client.search(src_product_id, geom=raster_client.dltile(dltile['properties']['key']), start_datetime=str(year)+quarter_s,  end_datetime=str(year)+quarter_e, cloud_fraction=0.2, limit=15)['features']
+    scenes = metadata_client.search(src_product_id, geom=raster_client.dltile(dltile['properties']['key']), start_datetime=sdate,  end_datetime=edate, cloud_fraction=0.2, limit=15)['features']
 
     #get the least cloudy one
     #scenes = sorted(scenes, key=lambda k: k.properties.cloud_fraction, reverse=False)
@@ -350,7 +350,7 @@ def predict_1(dltile, src_product_id, dest_product_id, fc_id, year, quarter_s, q
     return json.dumps(output) #scene_check_ids
     #return large_prediction
 
-def predict_2(storage_key, dl_ft, src_product_id, dest_fc_id, storage_flag):
+def S2Infer2(storage_key, dl_ft, src_product_id, dest_fc_id, storage_flag):
     import tensorflow as tf
     import numpy as np
     import keras, json, time, datetime, itertools, pyproj
@@ -791,7 +791,7 @@ def predict_2(storage_key, dl_ft, src_product_id, dest_fc_id, storage_flag):
 
     return 0
 
-def rnn_1(dltile, src_vector_id, dest_vector_id, dest_product_id, push_rast = True):
+def S2RNN1(dltile, src_vector_id, dest_vector_id, dest_product_id, push_rast = True):
     import descarteslabs as dl
     import tensorflow as tf
     import numpy as np
@@ -1456,7 +1456,7 @@ def rnn_1(dltile, src_vector_id, dest_vector_id, dest_product_id, push_rast = Tr
     out_fc = geojson.FeatureCollection(None,properties={'FLAG':'SUCCESS','uploaded_fts':len(new_features)})
     return json.dumps(out_fc)
 
-def spot_vectoriser(dltile, src_product_id, band_names, scales, dest_fc_id,shp_str):
+def SPOTVectoriser(dltile, src_product_id, band_names, scales, dest_fc_id,shp_str):
     import numpy as np
     import json, geojson, time, datetime
     from io import StringIO
@@ -1722,7 +1722,7 @@ def spot_vectoriser(dltile, src_product_id, band_names, scales, dest_fc_id,shp_s
             elif pp.type=='Polygon':
                 polys_flattened+=[pp]
             elif pp.type=='GeometryCollection' and not pp.is_empty:
-                for subpp in list(GeometryCollection):
+                for subpp in list(pp):
                     if subpp.type=='MultiPolygon':
                         polys_flattened+=list(subpp)
                     elif subpp.type=='Polygon':
@@ -2127,8 +2127,8 @@ def spot_vectoriser(dltile, src_product_id, band_names, scales, dest_fc_id,shp_s
     return json.dumps(output) #scene_check_ids
 
 DL_CLOUD_FUNCTIONS = {
-    'predict_1':predict_1,
-    'predict_2':predict_2,
-    'spot_vectoriser':spot_vectoriser,
-    'rnn_1':rnn_1
+    'S2Infer1':S2Infer1,
+    'S2Infer2':S2Infer2,
+    'S2RNN1':S2RNN1,
+    'SPOTVectoriser':SPOTVectoriser,
 }

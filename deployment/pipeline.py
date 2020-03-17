@@ -298,7 +298,7 @@ class Pipeline:
                     band_names=[self.prod_config['SPOT-R1-Primary']['other']['bands'][0]['name']], 
                     scales=[self.prod_config['SPOT-R1-Primary']['other']['bands'][0]['data_range']], 
                     dest_fc_id=self.prod_config['SPOT-V1-Vecotrised']['cloud_id'],
-                    shp_str=shp_str
+                    shp_str=shp_str)
 
 
 if __name__ =="__main__":
