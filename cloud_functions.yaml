@@ -1,0 +1,53 @@
+S2Infer1:
+  group_id: fe6ef9dc
+  image: us.gcr.io/dl-ci-cd/images/tasks/public/py3.7-gpu:v2020.01.21-7-g309186be
+  maximum_concurrency: 500
+  memory: 7.4Gi
+  name: S2Infer1
+  requirements: []
+  retry_count: 0
+  task_timeout: 21600
+  tiledict:
+    pad: 0
+    resolution: 10
+    tilesize: 2000
+  timestamp: '2020-03-17 16:09:04.801036'
+S2Infer2:
+  group_id: 14d752b6
+  image: us.gcr.io/dl-ci-cd/images/tasks/public/py3.7-gpu:v2020.01.21-7-g309186be
+  maximum_concurrency: 500
+  memory: 3.5Gi
+  name: S2Infer2
+  requirements: []
+  retry_count: 0
+  task_timeout: 21600
+  tiledict: null
+  timestamp: '2020-03-17 16:09:08.335085'
+S2RNN1:
+  group_id: 7b4038ed
+  image: us.gcr.io/dl-ci-cd/images/tasks/public/py3.7-gpu:v2020.01.21-7-g309186be
+  maximum_concurrency: 15
+  memory: 3.5Gi
+  name: S2RRN1
+  requirements: []
+  retry_count: 0
+  task_timeout: 21600
+  tiledict:
+    pad: 0
+    resolution: 10
+    tilesize: 10000
+  timestamp: '2020-03-17 16:09:13.189497'
+SPOTVectoriser:
+  group_id: 1553b236
+  image: us.gcr.io/dl-ci-cd/images/tasks/public/py3.7-gpu:v2020.01.21-7-g309186be
+  maximum_concurrency: 200
+  memory: 3.7Gi
+  name: SPOTVectoriser
+  requirements: []
+  retry_count: 0
+  task_timeout: 28800
+  tiledict:
+    pad: 200
+    resolution: 1.5
+    tilesize: 4096
+  timestamp: '2020-03-17 16:09:18.764788'

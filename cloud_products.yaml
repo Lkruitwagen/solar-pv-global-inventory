@@ -1,0 +1,95 @@
+Combined-V1:
+  cloud_id: ba611607613832ad7bb8fa9dc2bafb71f693bd6a:solar_pv:combined_v1:vecotrisation
+  description: Solar PV featurecollection combining S2 and SPOT pipelines.
+  name: solar_pv:combined_v1:vecotrisation
+  other: null
+  timestamp: '2020-03-17 14:26:18.799645'
+  title: Solar PV Combined FeatureCollection
+  type: vector
+S2-R1-Primary:
+  cloud_id: ba611607613832ad7bb8fa9dc2bafb71f693bd6a:solar_pv:s2_r1:primary_pass
+  description: Solar PV inference from the inital pass of the S2 UNet model.
+  name: solar_pv:s2_r1:primary_pass
+  other:
+    bands:
+    - &id001
+      colormap_name: magma
+      data_range:
+      - 0
+      - 255
+      dtype: Byte
+      name: probability
+      nbits: 8
+      srcband: 1
+      type: mask
+  timestamp: '2020-03-17 14:26:20.539507'
+  title: S2 UNet Primary Raster
+  type: raster
+S2-R2-Secondary:
+  cloud_id: ba611607613832ad7bb8fa9dc2bafb71f693bd6a:solar_pv:s2_r2:secondary_pass
+  description: Solar PV inference after the filter by RNN-1.
+  name: solar_pv:s2_r2:secondary_pass
+  other:
+    bands:
+    - *id001
+  timestamp: '2020-03-17 14:26:22.689719'
+  title: S2 UNet Secondary Raster
+  type: raster
+S2-V1-Primary:
+  cloud_id: ba611607613832ad7bb8fa9dc2bafb71f693bd6a:solar_pv:s2_v1:primary_pass
+  description: Solar PV vectorisation from the inital pass of the S2 UNet model.
+  name: solar_pv:s2_v1:primary_pass
+  other: null
+  timestamp: '2020-03-17 14:26:23.200890'
+  title: S2 UNet Primary FeatureCollection
+  type: vector
+S2-V2-Secondary:
+  cloud_id: ba611607613832ad7bb8fa9dc2bafb71f693bd6a:solar_pv:s2_v2:secondary_pass
+  description: Solar PV vectorisation based on the filter by RNN-1.
+  name: solar_pv:s2_v2:secondary_pass
+  other: null
+  timestamp: '2020-03-17 14:26:23.713382'
+  title: S2 UNet Secondary FeatureCollection
+  type: vector
+S2-V3-Deepstack:
+  cloud_id: ba611607613832ad7bb8fa9dc2bafb71f693bd6a:solar_pv:s2_v3:deepstack
+  description: Solar PV vectorisation based on the deepstack inference.
+  name: solar_pv:s2_v3:deepstack
+  other: null
+  timestamp: '2020-03-17 14:26:24.327912'
+  title: S2 UNet Deepstack FeatureCollection
+  type: vector
+S2-V4-Final:
+  cloud_id: ba611607613832ad7bb8fa9dc2bafb71f693bd6a:solar_pv:s2_v4:final
+  description: Solar PV vectorisation after RNN-2 filtering.
+  name: solar_pv:s2_v4:final
+  other: null
+  timestamp: '2020-03-17 14:26:25.352122'
+  title: S2 UNet Final FeatureCollection
+  type: vector
+SPOT-R1-Primary:
+  cloud_id: ba611607613832ad7bb8fa9dc2bafb71f693bd6a:solar_pv:spot_r1:primary_pass
+  description: Solar PV inference from the initial pass of the SPOT UNet model.
+  name: solar_pv:spot_r1:primary_pass
+  other:
+    bands:
+    - *id001
+  timestamp: '2020-03-17 14:26:27.093094'
+  title: SPOT 6/7 Primary Raster
+  type: raster
+SPOT-V1-Vectorised:
+  cloud_id: ba611607613832ad7bb8fa9dc2bafb71f693bd6a:solar_pv:spot_v1:vectorisation
+  description: Solar PV vectorised from the primary SPOT UNet pass.
+  name: solar_pv:spot_v1:vectorisation
+  other: null
+  timestamp: '2020-03-17 14:26:27.604585'
+  title: SPOT 6/7 Vectorised FeatureCollection
+  type: vector
+SPOT-V2-Filtered:
+  cloud_id: ba611607613832ad7bb8fa9dc2bafb71f693bd6a:solar_pv:spot_v2:filtered
+  description: Solar PV featurecollection filtered by ResNet50.
+  name: solar_pv:spot_v2:filtered
+  other: null
+  timestamp: '2020-03-17 14:26:28.117203'
+  title: SPOT 6/7 Filtered FeatureCollection
+  type: vector
