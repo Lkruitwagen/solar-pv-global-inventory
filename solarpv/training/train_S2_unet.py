@@ -166,8 +166,7 @@ class DataGenerator(Sequence):
                 # Store class
                 y[i,:,:] = np.load(ID['data'])['annotation'].astype('int')/255
                 #print (y)
-                print (ID)
-                print (np.unique(y))
+
 
         return X, to_categorical(y, num_classes=self.n_classes)
 
