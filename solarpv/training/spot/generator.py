@@ -31,16 +31,16 @@ def read_tif(path: str, channels_last: bool = True):
             image = ds.read()
     except AttributeError as error:
         raise Exception("Could not open: %s" % path) from error
-    
+
     n_dims = len(image.shape)
     if n_dims < 3:
         image = image[np.newaxis]
-        
+
     if channels_last:
         # Let's have bands (channels) as the last rather than first axis, as
         # usually expected by Keras/Tensorflow
         return np.transpose(image, axes=(1, 2, 0))
-    
+
     return image
 
 
@@ -63,10 +63,16 @@ class DataGenerator(keras.utils.Sequence):
         
     Augmentations are provided as a list of transformation functions. See `transforms.py`.
     """
-    def __init__(self, data_list, batch_size=32, dim=(512, 512, 4),
-                 shuffle=True, augment=False,
-                 transforms=None,
-                 ):
+
+    def __init__(
+        self,
+        data_list,
+        batch_size=32,
+        dim=(512, 512, 4),
+        shuffle=True,
+        augment=False,
+        transforms=None,
+    ):
         """
         Parameters
         ----------
@@ -107,16 +113,16 @@ class DataGenerator(keras.utils.Sequence):
         self.dim = dim
         self.batch_size = batch_size
         self.data_list = data_list
-        self.indexes = None # int indices (possibly random), set by self.on_epoch_end()
+        self.indexes = None  # int indices (possibly random), set by self.on_epoch_end()
         self.shuffle = shuffle
-        self.augment=augment
+        self.augment = augment
         self.transforms = transforms
-        
+
         # read in list of keys
-        with open(data_list, 'r') as f:
+        with open(data_list, "r") as f:
             self.keys = f.read().splitlines()
         self.n_keys = len(self.keys)
-        
+
         self.on_epoch_end()
 
     def __len__(self):
@@ -134,14 +140,14 @@ class DataGenerator(keras.utils.Sequence):
         index : int
             Batch index. If batch size is 10 and index is 3, this will yield samples 30-39
         """
-        indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
-        
+        indexes = self.indexes[index * self.batch_size : (index + 1) * self.batch_size]
+
         # Find list of IDs
         batch_keys = [self.keys[k] for k in indexes]
-        
+
         # Generate data
         X, y = self.__data_generation(batch_keys)
-        
+
         return X, y
 
     def on_epoch_end(self):
@@ -163,8 +169,8 @@ class DataGenerator(keras.utils.Sequence):
         # Generate data
         for i, key in enumerate(batch_keys):
             # load image and target
-            f_img = key+'_image.tif'
-            f_trg = key+'_target.tif'
+            f_img = key + "_image.tif"
+            f_trg = key + "_target.tif"
             img = read_tif(f_img, channels_last=True)
             trg = read_tif(f_trg)
 

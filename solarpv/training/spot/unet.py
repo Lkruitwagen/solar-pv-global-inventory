@@ -14,21 +14,21 @@ from tensorflow.keras.models import Model
 
 
 def UNet(
-        n_bands,
-        n_classes,
-        n1_filters=32,
-        depth=5,
-        kernel=(3, 3),
-        activation="relu",
-        padding="same",
-        dilation_rate=1,
-        input_highway=False,
-        noise=0.0,
-        get_logits=False,
-        do_batch_norm=False,
-        dropout_val=0.0,
-        l2_reg_val=0.0,
-        compile_kwargs=None,
+    n_bands,
+    n_classes,
+    n1_filters=32,
+    depth=5,
+    kernel=(3, 3),
+    activation="relu",
+    padding="same",
+    dilation_rate=1,
+    input_highway=False,
+    noise=0.0,
+    get_logits=False,
+    do_batch_norm=False,
+    dropout_val=0.0,
+    l2_reg_val=0.0,
+    compile_kwargs=None,
 ):
     """UNet, as in https://arxiv.org/pdf/1505.04597.pdf
 
