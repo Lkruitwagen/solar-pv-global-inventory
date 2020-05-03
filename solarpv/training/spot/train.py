@@ -10,11 +10,11 @@ from datetime import datetime
 from functools import partial
 import inspect
 import logging
-import numpy as np
 import os
 from time import time
 import warnings
 
+import numpy as np
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import (
@@ -28,8 +28,6 @@ from tensorflow.keras.callbacks import (
 from generator import DataGenerator
 from unet import UNet
 import transforms
-
-usage = "usage: python train.py --train"
 
 params = {
     "seed": 21,  # for train/val data split
@@ -117,9 +115,9 @@ def train_from_document(params=params):
     ----------
     model : .hdf5 file
         Final Keras model
-    loss_fname : .csv file
-        File with loss as a function of epoch
-    logfile :
+    loss : CSF file
+        Saves csv file with loss as a function of epoch to file `loss_fname`
+    logfile : text file
         File of logging statements
     """
     t0 = time()

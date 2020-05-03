@@ -23,7 +23,7 @@ def read_tif(path: str, channels_last: bool = True):
 
     Returns
     -------
-    image: numpy ndarray
+    image: ndarray
         The image from this tif file. The axis order depends on kwarg CHANNELS_LAST.
     """
     try:
@@ -76,8 +76,8 @@ class DataGenerator(keras.utils.Sequence):
         """
         Parameters
         ----------
-        data_list : path to text file
-            Text file with list of keys.
+        data_list : str
+            Path of text file with list of keys.
         batch_size : int
             size of batch to be yielded for training
         dim : list
@@ -146,9 +146,9 @@ class DataGenerator(keras.utils.Sequence):
         batch_keys = [self.keys[k] for k in indexes]
 
         # Generate data
-        X, y = self.__data_generation(batch_keys)
+        x, y = self.__data_generation(batch_keys)
 
-        return X, y
+        return x, y
 
     def on_epoch_end(self):
         """
@@ -163,7 +163,7 @@ class DataGenerator(keras.utils.Sequence):
         Generates data containing batch_size samples
         """
         # Initialization
-        X = np.empty((self.batch_size, *self.dim))
+        x = np.empty((self.batch_size, *self.dim))
         y = np.empty((self.batch_size, self.dim[0], self.dim[1], 1))
 
         # Generate data
@@ -178,7 +178,7 @@ class DataGenerator(keras.utils.Sequence):
                 for transform in self.transforms:
                     img, trg = transform(img, trg)
 
-            X[i, ...] = img
+            x[i, ...] = img
             y[i, ...] = trg
 
-        return X, y
+        return x, y
