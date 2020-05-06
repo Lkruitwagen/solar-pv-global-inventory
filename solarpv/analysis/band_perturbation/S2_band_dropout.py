@@ -128,72 +128,88 @@ class BandDropoutS2:
                 ious_batch = np.sum((pred>0.1).astype(int) * ann, axis=(1,2)) / np.sum(((pred>0.1).astype(int) + ann).clip(0,1), axis=(1,2))  #batch size
                 
 
-            ious[ii_g*self.BATCH_SIZE:(ii_g+1)*self.BATCH_SIZE,ii_b]=ious_batch
+                ious[ii_g*self.BATCH_SIZE:(ii_g+1)*self.BATCH_SIZE,ii_b]=ious_batch
 
         df.loc[:,'data'] = ious.ravel()
         return df
 
+    def loop_figs(self,n_figs, savepath):
 
-    def _run_inference_fig(self, perturbation=None, perturbation_magnitude=0.05, examples_path=None, examples_freq=0.05, batch_size=1):
+        indices = np.random.choice(len(self.records), n_figs, replace=False)
+        logging.info(f'generating figures')
+        self._run_inference_fig(indices,perturbation=None, savepath=savepath)
 
-        if examples_path:
-            FIG_FLAG = np.random.rand()<examples_freq
+
+        for perturbation_magnitude in [0.1,0.2,0.3]:
+            self._run_inference_fig(indices,perturbation='additive', perturbation_magnitude=perturbation_magnitude, savepath=savepath)
+
+        for perturbation_magnitude in [0.1, 0.2, 0.3]:
+            self._run_inference_fig(indices,perturbation='multiplicative', perturbation_magnitude=perturbation_magnitude,savepath=savepath)
+
+
+
+    def _run_inference_fig(self, indices, perturbation=None, perturbation_magnitude=0.05, savepath=None):
+
+        if not perturbation:
+            perturbation_str = 'dropout'
         else:
-            FIG_FLAG = False
+            perturbation_str = perturbation + '_' + str(perturbation_magnitude)
 
-        if FIG_FLAG:
+        for ii_f in indices:
+            logging.info(f'Generating figs for record {self.records[ii_f]}')
+            sample = np.load(open(self.records[ii_f]['data'],'rb'))['data']
+            ann = np.load(open(self.records[ii_f]['data'],'rb'))['annotation'].astype(int)/255
+
             fig, axs = plt.subplots(4,4,figsize=(20,20))
 
-        for ii in range(sample.shape[-1]):
-            do_sample = sample.copy()
-            #do_sample[:,:,ii]=0
-            #print (do_sample.shape)
-            #print (do_sample.mean(axis=0).mean(axis=0))
+            for ii in range(sample.shape[-1]):
+                do_sample = sample.copy()
+                #do_sample[:,:,ii]=0
+                #print (do_sample.shape)
+                #print (do_sample.mean(axis=0).mean(axis=0))
 
-            if perturbation==None:
-                do_sample[:,:,ii]=0#do_sample[:,:,ii]+noise
+                if perturbation==None:
+                    do_sample[:,:,ii]=0#do_sample[:,:,ii]+noise
 
-            elif perturbation=='additive':
-                noise = perturbation_magnitude*np.random.rand(200*200).reshape(200,200) - perturbation_magnitude/2
-                do_sample[:,:,ii]=do_sample[:,:,ii]+noise
+                elif perturbation=='additive':
+                    noise = perturbation_magnitude*np.random.rand(200*200).reshape(200,200) - perturbation_magnitude/2
+                    do_sample[:,:,ii]=do_sample[:,:,ii]+noise
 
-            elif perturbation=='multiplicative':
-                noise = np.ones((200,200))+ perturbation_magnitude*np.random.rand(200*200).reshape(200,200) - perturbation_magnitude/2
-                do_sample[:,:,ii]=do_sample[:,:,ii]*noise
+                elif perturbation=='multiplicative':
+                    noise = np.ones((200,200))+ perturbation_magnitude*np.random.rand(200*200).reshape(200,200) - perturbation_magnitude/2
+                    do_sample[:,:,ii]=do_sample[:,:,ii]*noise
 
-            do_sample = do_sample.clip(0,1)
-            
+                do_sample = do_sample.clip(0,1)
+                
 
-            pred = np.squeeze(self.model.predict(do_sample[np.newaxis,...]))
-            pred = (pred[...,1] - pred[...,0]).clip(0,1)
+                pred = np.squeeze(self.model.predict(do_sample[np.newaxis,...]))
+                pred = (pred[...,1] - pred[...,0]).clip(0,1)
 
-            iou = np.sum((pred>0.1).astype(int) * ann) / np.sum(((pred>0.1).astype(int) + ann).clip(0,1))
-            ious.append(iou)
+                intersection = np.sum((pred>0.1).astype(int) * ann)
+                union = np.sum(((pred>0.1).astype(int) + ann).clip(0,1))
+                #logging.info(f'intersection:{intersection}, union: {union}')
+                iou =  intersection/union 
 
-            if FIG_FLAG:
+
+
                 axs[ii//4, ii%4].imshow(pred)
                 axs[ii//4, ii%4].set_title(f'{self.band_list[ii]} IoU: {iou}',fontsize=12)
                 axs[ii//4, ii%4].set_axis_off()
 
-        pred = np.squeeze(self.model.predict(sample[np.newaxis,...]))
-        pred = (pred[...,1] - pred[...,0]).clip(0,1)
+            pred = np.squeeze(self.model.predict(sample[np.newaxis,...]))
+            pred = (pred[...,1] - pred[...,0]).clip(0,1)
 
-        iou = np.sum((pred>0.1).astype(int) * ann) / np.sum(((pred>0.1).astype(int) + ann).clip(0,1))
-        ious.append(iou)
+            iou = np.sum((pred>0.1).astype(int) * ann) / np.sum(((pred>0.1).astype(int) + ann).clip(0,1))
 
 
-        if FIG_FLAG:
             axs[3,2].imshow(pred)
             axs[3,2].set_title(f'All bands IoU: {iou}',fontsize=12)
-            axs[3,3].imshow(sample[:,:,0:3])
+            axs[3,3].imshow((sample[:,:,0:3]*2.5).clip(0,1))
             axs[3,2].set_axis_off()
             axs[3,3].set_axis_off()
-            #logging.info(f'saving fig {str(ii_r)+perturbation_str+".png"}')
-            fig.savefig(os.path.join(examples_path,str(ii_r)+'_'+perturbation_str+'.png'))
-            fig = None
-
-        df.loc[ii_r,:] = ious
-        return df
+                #logging.info(f'saving fig {str(ii_r)+perturbation_str+".png"}')
+            fig.savefig(os.path.join(savepath,str(ii_f)+'_'+perturbation_str+'.png'))
+            plt.close(fig)
 
 
 
@@ -209,4 +225,4 @@ if __name__=="__main__":
         records_path=os.path.join(os.getcwd(),'data','crossvalidation','S2_unet','records.pickle'),
         model_path=os.path.join(os.getcwd(),'data','S2_unet.h5'),
         batch_size=1)
-    bdo.loop_inference()
+    bdo.loop_figs(n_figs=10, savepath=os.path.join(os.getcwd(),'solarpv','analysis','band_perturbation'))
