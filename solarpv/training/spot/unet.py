@@ -59,7 +59,7 @@ def UNet(
 
     for i in range(depth - 2, -1, -1):
         up = Conv2DTranspose(
-            n1_filters * 2 ** i, (2, 2), strides=(2, 2), padding=padding
+            n1_filters * 2 ** (i+1), (2, 2), strides=(2, 2), padding=padding
         )(conv)
         up = concatenate([up, convolutions[i]], axis=3)
         conv = Conv2D(n1_filters * 2 ** i, **conv_kwargs)(up)
