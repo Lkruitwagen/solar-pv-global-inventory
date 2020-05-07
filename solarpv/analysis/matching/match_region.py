@@ -102,7 +102,9 @@ class MatchRegion:
             self.source_gdf = self.source_gdf[self.source_gdf['iso-3166-1'].isin(region)]
             self.target_gdf = self.target_gdf[self.target_gdf['iso-3166-1'].isin(region)]
 
+        logger.info('Source gdf:')
         print (self.source_gdf)
+        logger.info('Target gdf:')
         print (self.target_gdf)
         
 
@@ -180,18 +182,19 @@ class MatchRegion:
             return target_df[bool_ind]['unique_id'].values.tolist()
 
         source_df['sjoin_ids'] = source_df.apply(lambda row: _match_st(row), axis=1)
+        logger.info('Non-matched df:')
         print (source_df[source_df['sjoin_ids'].str.len()<1])
 
         for ii_r,row in enumerate(source_df.iterrows()):
 
             if ii_r %100==0: 
-                print (ii_r)
+                print ('#', end='')
 
 
             G.add_edges_from([(row[1]['unique_id'],ii) for ii in row[1]['sjoin_ids']])
 
-        print ('n nodes', len(G.nodes))
-        print ('e dges', len(G.edges))
+        logger.info (f'n nodes {len(G.nodes)}')
+        logger.info(f'e dges {len(G.edges)}')
 
         self.G = G
         
@@ -199,11 +202,12 @@ class MatchRegion:
 
     def run_main(self):
 
-        print ('n connect components', len([_ for _ in nx.connected_components(self.G)]))
+        logger.info (f'n connect components: {len([_ for _ in nx.connected_components(self.G)])}')
 
         self.source_gdf['match_id'] = ''
 
         for ii_c, cc in enumerate(nx.connected_components(self.G)):
+            print (f'Running component: {ii_c}, len: {len(cc)}', end=' ')
             
             B, E_z, E_mw = self.run_component(cc)
 
@@ -215,7 +219,7 @@ class MatchRegion:
                         matches+=1
                         self.source_gdf.loc[kk,'match_id']=kk2
 
-            print ('component',ii_c, len(cc), 'found matches:',matches)
+           print (f'found matches: {matches}, time: {time.time()-tic}')
 
 
 
