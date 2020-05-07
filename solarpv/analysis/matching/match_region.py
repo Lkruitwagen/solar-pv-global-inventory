@@ -219,11 +219,11 @@ class MatchRegion:
                         matches+=1
                         self.source_gdf.loc[kk,'match_id']=kk2
 
-           print (f'found matches: {matches}, time: {time.time()-tic}')
+            print (f'found matches: {matches}, time: {time.time()-tic}')
 
 
 
-        self.source_gdf.to_file(self.outfile, driver="GPKG")
+        self.source_gdf.to_file(self.outpath, driver="GPKG")
 
 
 
