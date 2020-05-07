@@ -1,4 +1,4 @@
-import json, logging, pickle, os, sys
+import json, logging, pickle, os, sys, time
 
 from shapely import geometry
 from pulp import *
@@ -6,6 +6,8 @@ import pandas as pd
 import geopandas as gpd
 import numpy as np
 from geopy.distance import geodesic
+
+tic = time.time()
 
 
 from shapely.strtree import STRtree
@@ -202,16 +204,22 @@ class MatchRegion:
         self.source_gdf['match_id'] = ''
 
         for ii_c, cc in enumerate(nx.connected_components(self.G)):
-            print ('component',ii_c, len(cc))
+            
             B, E_z, E_mw = self.run_component(cc)
+
+            matches = 0
 
             for kk, vv in B.items():
                 for kk2, vv2 in vv.items():
                     if vv2.value()>0:
-                        print (kk,kk2)
+                        matches+=1
                         self.source_gdf.loc[kk,'match_id']=kk2
 
-        self.source_gdf.to_file(os.path.join(os.getcwd(),'data','_'.join('match',self.match,'-'.join(region))), layer='countries', driver="GPKG")
+            print ('component',ii_c, len(cc), 'found matches:',matches)
+
+
+
+        self.source_gdf.to_file(self.outfile, driver="GPKG")
 
 
 
@@ -235,7 +243,7 @@ class MatchRegion:
             pt.MW = row[1]['capacity_mw']
             pts_target.append(pt)
 
-        model, B, E_z, E_mw, Z = milp_geodesic_network_satisficing(pts_source, pts_target, self.alpha, self.mipgap, v=True)
+        model, B, E_z, E_mw, Z = milp_geodesic_network_satisficing(pts_source, pts_target, self.alpha, self.mipgap, v=False)
 
         return B, E_z, E_mw
 
