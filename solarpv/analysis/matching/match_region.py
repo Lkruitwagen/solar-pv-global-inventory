@@ -6,6 +6,10 @@ import pandas as pd
 import geopandas as gpd
 import numpy as np
 from geopy.distance import geodesic
+import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
+
+
 
 tic = time.time()
 
@@ -16,6 +20,8 @@ import networkx as nx
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+gpd.options.use_pygeos=False
 
 
 def milp_geodesic_network_satisficing(pts_A, pts_B, alpha,mipgap=0.0001,v=False):
@@ -79,11 +85,13 @@ def milp_geodesic_network_satisficing(pts_A, pts_B, alpha,mipgap=0.0001,v=False)
 class MatchRegion:
 
     def __init__(self, match,region, dist_buffer=10000, alpha=0.15, mipgap=0.0001):
+        self.match=match
         self.buffer=dist_buffer
         self.alpha=alpha
         self.mipgap=mipgap
+        self.region=region
 
-        self.outpath = os.path.join(os.getcwd(),'data','_'.join(['match',match,'-'.join(region),str(dist_buffer),str(alpha)])+'.gpkg')
+        self.outpath = os.path.join(os.getcwd(),'data','_'.join(['match',match,'-'.join(region),str(dist_buffer),str(alpha)]))
 
         if match=='wri':
             self.target_gdf= self.prep_wri()
@@ -101,6 +109,8 @@ class MatchRegion:
         if region: # must be list(iso-3166-1), for now.
             self.source_gdf = self.source_gdf[self.source_gdf['iso-3166-1'].isin(region)]
             self.target_gdf = self.target_gdf[self.target_gdf['iso-3166-1'].isin(region)]
+
+        self.ne = gpd.read_file(os.path.join(os.getcwd(),'data','ne_10m_countries.gpkg'))
 
         logger.info('Source gdf:')
         print (self.source_gdf)
@@ -223,7 +233,67 @@ class MatchRegion:
 
 
 
-        self.source_gdf.to_file(self.outpath, driver="GPKG")
+        self.source_gdf.to_file(self.outpath+'.gpkg', driver="GPKG")
+
+    def visualise(self, bounds = None):
+
+        logger.info('Visualising...')
+        fig, ax = plt.subplots(1,1,figsize=(72,72))
+        self.ne[self.ne['ISO_A2'].isin(self.region)].boundary.plot(ax=ax, color='grey')
+
+        # plot the scatter -> how to adjust sizes?
+        self.source_gdf.plot(ax=ax, marker='o',color='g',markersize=self.source_gdf['capacity_mw'])
+        self.target_gdf.plot(ax=ax, marker='o',color='r',markersize=self.target_gdf['capacity_mw'])
+
+        # plot the links
+
+        link_df = pd.DataFrame(self.source_gdf)
+        link_df = link_df[link_df['match_id']!='']
+        link_df = link_df.merge(pd.DataFrame(self.target_gdf[['unique_id','geometry']]), how='left', left_on='match_id',right_on='unique_id')
+
+
+        link_df['points'] = link_df[['geometry_x','geometry_y']].values.tolist()
+
+        link_df['ls_geom'] = link_df['points'].apply(geometry.LineString)
+
+        links_gdf = gpd.GeoDataFrame(link_df, geometry=link_df['ls_geom'], crs={'init':'epsg:4326'})
+
+        links_gdf.plot(ax=ax, color='b')
+
+        matched_obs = len(link_df)
+        unmatched_obs = len(self.source_gdf)-len(link_df)
+        matched_sample = len(list(self.source_gdf['match_id'].unique()))
+        unmatched_sample = len(list(set(self.target_gdf['unique_id'].unique())-set(self.source_gdf['match_id'].unique())))
+
+
+        text = '\n'.join([
+            f'Distance: {self.buffer}',
+            f'Region: {",".join(self.region)}',
+            f'Alpha:{self.alpha}',
+            f'Elapsed time: {time.time()-tic}',
+            f'Matched Obs: {matched_obs}',
+            f'Unmatched Obs: {unmatched_obs}',
+            f'Matched Sample: {matched_sample}',
+            f'Unmatched Sample: {unmatched_sample}'
+            ])
+
+        handles = [
+            mlines.Line2D([], [], color='gray', marker=None, lw=1, label='Region'),
+            mlines.Line2D([], [], color='g', marker='o', markersize=15, lw=0,label='Observations'),
+            mlines.Line2D([], [], color='r', marker='o', markersize=15, lw=0, label=self.match),
+            mlines.Line2D([], [], color='b', marker=None, lw=1,  label='Matches'),
+        ]
+
+        plt.legend(handles, ['Region','Observations',self.match,'Matches'], loc='lower left')
+ 
+
+        ax.text(0.85,0.9, text, multialignment='left', transform=ax.transAxes, fontsize=24)
+
+        fig.savefig(self.outpath+'.png')
+
+
+
+
 
 
 
@@ -253,6 +323,7 @@ class MatchRegion:
 
 
 if __name__=="__main__":
-    matcher=MatchRegion('wri',['GB'], dist_buffer=10000, alpha=0.15,mipgap=0.002)
+    matcher=MatchRegion('wri',['GB'], dist_buffer=5000, alpha=0.15,mipgap=0.002)
     matcher.get_components()
     matcher.run_main()
+    matcher.visualise()
