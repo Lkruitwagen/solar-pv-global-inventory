@@ -84,38 +84,30 @@ def milp_geodesic_network_satisficing(pts_A, pts_B, alpha,mipgap=0.0001,v=False)
 
 class MatchRegion:
 
-    def __init__(self, match,region, dist_buffer=10000, alpha=0.15, mipgap=0.0001):
+    def __init__(self, match):
         self.match=match
-        self.buffer=dist_buffer
-        self.alpha=alpha
-        self.mipgap=mipgap
-        self.region=region
-
-        self.outpath = os.path.join(os.getcwd(),'data','_'.join(['match',match,'-'.join(region),str(dist_buffer),str(alpha)]))
-
+        
         if match=='wri':
-            self.target_gdf= self.prep_wri()
+            self.ini_target_gdf= self.prep_wri()
         elif match=='eia':
-            self.target_gdf = self.prep_eia()
+            self.ini_target_gdf = self.prep_eia()
 
         
-        self.source_gdf = gpd.read_file(os.path.join(os.getcwd(),'data','ABCD_landcover.geojson')).reset_index()
-        self.source_gdf['capacity_mw'] = self.source_gdf['area']*44.2/1000/1000
-        self.source_gdf = self.source_gdf.rename(columns={'index':'unique_id'})
-        self.source_gdf.geometry = self.source_gdf.geometry.representative_point()
-        self.source_gdf = self.source_gdf[['unique_id','iso-3166-1','capacity_mw','geometry']]
+        source_gdf = gpd.read_file(os.path.join(os.getcwd(),'data','ABCD_landcover.geojson')).reset_index()
+        source_gdf['capacity_mw'] = source_gdf['area']*44.2/1000/1000
+        source_gdf = source_gdf.rename(columns={'index':'unique_id'})
+        source_gdf.geometry = source_gdf.geometry.representative_point()
+        self.ini_source_gdf = source_gdf[['unique_id','iso-3166-1','capacity_mw','geometry']]
         
 
-        if region: # must be list(iso-3166-1), for now.
-            self.source_gdf = self.source_gdf[self.source_gdf['iso-3166-1'].isin(region)]
-            self.target_gdf = self.target_gdf[self.target_gdf['iso-3166-1'].isin(region)]
+        
 
         self.ne = gpd.read_file(os.path.join(os.getcwd(),'data','ne_10m_countries.gpkg'))
 
         logger.info('Source gdf:')
-        print (self.source_gdf)
+        print (self.ini_source_gdf)
         logger.info('Target gdf:')
-        print (self.target_gdf)
+        print (self.ini_target_gdf)
         
 
     def prep_wri(self):
@@ -168,7 +160,7 @@ class MatchRegion:
 
         return eia
 
-    def get_components(self, dist_buffer=10000):
+    def get_components(self):
         """
         use source and target gdfs to create a network, get the connected components of the network
         """
@@ -210,7 +202,20 @@ class MatchRegion:
         
 
 
-    def run_main(self):
+    def run_main(self,region, dist_buffer=10000, alpha=0.15, mipgap=0.0001):
+        self.buffer=dist_buffer
+        self.alpha=alpha
+        self.mipgap=mipgap
+        self.region=region
+
+        if region: # must be list(iso-3166-1), for now.
+            self.source_gdf = self.ini_source_gdf[self.ini_source_gdf['iso-3166-1'].isin(region)]
+            self.target_gdf = self.ini_target_gdf[self.ini_target_gdf['iso-3166-1'].isin(region)]
+
+
+        self.outpath = os.path.join(os.getcwd(),'data','_'.join(['match',self.match,'-'.join(self.region),str(self.buffer),str(self.alpha)]))
+
+        self.get_components()
 
         logger.info (f'n connect components: {len([_ for _ in nx.connected_components(self.G)])}')
 
@@ -323,7 +328,10 @@ class MatchRegion:
 
 
 if __name__=="__main__":
-    matcher=MatchRegion('wri',['GB'], dist_buffer=5000, alpha=0.15,mipgap=0.002)
-    matcher.get_components()
-    matcher.run_main()
-    matcher.visualise()
+    matcher=MatchRegion('wri')
+
+    for iso2 in matcher.ini_target_gdf['iso-3166-1'].unique():
+        logger.info(f'Running iso2: {iso2}')
+
+        matcher.run_main([iso2], dist_buffer=4000, alpha=0.05,mipgap=0.002)
+        matcher.visualise()
