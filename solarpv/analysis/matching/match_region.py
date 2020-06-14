@@ -295,6 +295,7 @@ class MatchRegion:
         ax.text(0.85,0.9, text, multialignment='left', transform=ax.transAxes, fontsize=24)
 
         fig.savefig(self.outpath+'.png')
+        plt.close()
 
 
 
@@ -329,9 +330,16 @@ class MatchRegion:
 
 if __name__=="__main__":
     matcher=MatchRegion('wri')
+    matcher.run_main(['NA'], dist_buffer=4000, alpha=0.05,mipgap=0.002)
+    matcher.visualise()
 
     for iso2 in matcher.ini_target_gdf['iso-3166-1'].unique():
         logger.info(f'Running iso2: {iso2}')
 
-        matcher.run_main([iso2], dist_buffer=4000, alpha=0.05,mipgap=0.002)
-        matcher.visualise()
+        if iso2=="'NA":
+            print ('found namibia')
+
+        else:
+
+            matcher.run_main([iso2], dist_buffer=4000, alpha=0.05,mipgap=0.002)
+            matcher.visualise()
