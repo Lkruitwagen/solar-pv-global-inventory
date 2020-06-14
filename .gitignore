@@ -6,3 +6,4 @@ data/*
 *.h5
 **/.ipynb_checkpoints/*
 makefigs/DEP/*
+bin/get_dl.py
