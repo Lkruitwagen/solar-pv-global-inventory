@@ -116,7 +116,7 @@ class DataGenerator(Sequence):
 
     def __len__(self):
         """Denotes the number of batches per epoch"""
-        return int(np.floor(len(self.list_IDs) / self.batch_size))
+        return int(np.ceil(len(self.list_IDs) / self.batch_size))
 
     def __getitem__(self, index):
         """Generate indexes of the batch"""
@@ -248,6 +248,6 @@ if __name__ == "__main__":
         data_dir=os.path.join(os.getcwd(),'data','S2_unet'),
         outp_fname='s2_unet.h5',
         trn_records_pickle=os.path.join(os.getcwd(),'data','S2_unet','records.pickle'))
-    trn.train(os.path.join(os.getcwd(),'training','model_resunet.json'))
+    trn.train(os.path.join(os.getcwd(),'solarpv','training','model_resunet.json'))
 
     

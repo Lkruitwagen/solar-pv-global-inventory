@@ -1,6 +1,6 @@
 """
 """
-import logging
+import logging, sys, argparse, os
 
 from tensorflow.python import keras
 import descarteslabs as dl
@@ -36,7 +36,14 @@ def store_ML_model(model_path, model_name):
     storage_client.set('_'.join(['ML_model','shapes',model_name]), json.dumps(np_shapes), storage_type='data')
 
 
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model_path", help="path to the model to be sent to cloud storage", type=str)
+    args = parser.parse_args()
 
+    if args.model_path:
+        print (args.model_path)
+        store_ML_model(args.model_path,os.path.split(args.model_path)[1].split('.')[-1])
 
     
 
