@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
         }
 
         '#ed8540', '#2f9149','#b6eb7f','#d000ff','cyan','b'  #crop, forest, grass, dev, wet, barren
-        '#ae7229', '#6ca966', '#edeccd','#f10100','#71a4c1','#b3afa4'  # new color scheme
+        '#ae7229', '#6ca966', '#edeccd','#f10100','#71a4c1','#b3afa4'  # new color scheme -> replace barren: 42798a
 """
 
 
@@ -54,7 +54,7 @@ class Figure:
             'wetlands':'#71a4c1',
             'cropland':'#ae7229',
             'developed':'#f10100',
-            'barren':'#b3afa4',
+            'barren':'#42798a',
             'other':'#e7effc'
         }
 
@@ -64,7 +64,7 @@ class Figure:
             'wetlands':'#71a4c1',
             'cropland':'#ae7229',
             'human':'#f10100',
-            'barren':'#b3afa4',
+            'barren':'#42798a',
             'other':'#e7effc',
             np.nan:'#e7effc'
         }
@@ -207,7 +207,7 @@ class Figure:
 
         draw_arr[mask]=np.nan
 
-        cmap = colors.ListedColormap(['#ae7229', '#6ca966', '#edeccd','#f10100','#71a4c1','#b3afa4']) # cropland, forest, grassland, developed, wetlands, barren/other
+        cmap = colors.ListedColormap(['#ae7229', '#6ca966', '#edeccd','#f10100','#71a4c1','#42798a']) # cropland, forest, grassland, developed, wetlands, barren/other
         bounds=[0,1,2,3,4,5]
         norm = colors.BoundaryNorm(bounds, cmap.N)
 
@@ -311,7 +311,7 @@ class Figure:
         print ('diff pv')
         print (diff)
 
-        diff.plot.barh(ax=axs['local_skew'], color=['#ae7229', '#6ca966', '#edeccd','#f10100','#71a4c1','#b3afa4'])
+        diff.plot.barh(ax=axs['local_skew'], color=['#ae7229', '#6ca966', '#edeccd','#f10100','#71a4c1','#42798a'])
         axs['local_skew'].axvline(0, color='k', lw=0.5)
         axs['local_skew'].spines['right'].set_visible(False)
         axs['local_skew'].spines['top'].set_visible(False)
@@ -329,7 +329,7 @@ class Figure:
         print ('diff pix')
         print (diff)
 
-        diff.plot.barh(ax=axs['global_skew'], color=['#ae7229', '#6ca966', '#edeccd','#f10100','#71a4c1','#b3afa4'])
+        diff.plot.barh(ax=axs['global_skew'], color=['#ae7229', '#6ca966', '#edeccd','#f10100','#71a4c1','#42798a'])
         axs['global_skew'].axvline(0, color='k', lw=0.5)
         axs['global_skew'].spines['right'].set_visible(False)
         axs['global_skew'].spines['top'].set_visible(False)
@@ -484,7 +484,7 @@ class Figure:
 
             print (country, diff.max(), diff.min())
 
-            diff.plot.barh(ax=axs[country]['local_skew'], color=['#ae7229', '#6ca966', '#edeccd','#f10100','#71a4c1','#b3afa4'])
+            diff.plot.barh(ax=axs[country]['local_skew'], color=['#ae7229', '#6ca966', '#edeccd','#f10100','#71a4c1','#42798a'])
             axs[country]['local_skew'].axvline(0, color='k', lw=0.5)
             axs[country]['local_skew'].spines['right'].set_visible(False)
             axs[country]['local_skew'].spines['top'].set_visible(False)
@@ -509,7 +509,7 @@ class Figure:
 
             print (country, diff.max(), diff.min())
 
-            diff.plot.barh(ax=axs[country]['country_skew'], color=['#ae7229', '#6ca966', '#edeccd','#f10100','#71a4c1','#b3afa4'])
+            diff.plot.barh(ax=axs[country]['country_skew'], color=['#ae7229', '#6ca966', '#edeccd','#f10100','#71a4c1','#42798a'])
             axs[country]['country_skew'].axvline(0, color='k', lw=0.5)
             axs[country]['country_skew'].spines['right'].set_visible(False)
             axs[country]['country_skew'].spines['top'].set_visible(False)
@@ -592,5 +592,5 @@ class Figure:
 if __name__=="__main__":
     generator=Figure(make_arr=False)
     #generator.make_arr()
-    #generator.make_global()
-    generator.make_regional()
+    generator.make_global()
+    #generator.make_regional()
