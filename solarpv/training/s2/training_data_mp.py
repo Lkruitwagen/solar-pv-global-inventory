@@ -17,11 +17,9 @@ from utils import *
 logging.info(f'Initialising data handler...')
 raster_client = dl.Raster()
 metadata_client = dl.Metadata()
-exists_or_mkdir('training/data/')
-exists_or_mkdir('training/data/S2_unet/')
 
-trn_dltiles = json.load(open(exists_or_download('training/data/all_trn_dltiles.geojson'),'r'))['features']
-trn_polygons = json.load(open(exists_or_download('training/data/all_trn_polygons.geojson'),'r'))['features']
+trn_dltiles = json.load(open(os.path.join(os.getcwd(),'data','all_trn_dltiles.geojson'),'r'))['features']
+trn_polygons = json.load(open(os.path.join(os.getcwd(),'data','all_trn_polygons.geojson'),'r'))['features']
 
 
 def annotation_from_tile(tile_key,ii_t,mode='trn'):

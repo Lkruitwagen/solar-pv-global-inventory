@@ -302,5 +302,18 @@ class Pipeline:
 
 
 if __name__ =="__main__":
+
+    
+
+
+
+if __name__ == "__main__":
     pl = Pipeline()
-    pl.run('S2Infer1','BE')
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--stage", help="specify the pipeline stage, one of ['S2Infer1','S2RNN1','S2Infer2','SPOTVectoriser']", type=str)
+    parser.add_argument("--geography", help="specify a country geography with the iso-3166-1 2-letter code", type=str)
+    args = parser.parse_args()
+
+    if args.stage and args.geography:
+        print (args.stage, args.geography)
+        pl.run(args.state,args.geography)

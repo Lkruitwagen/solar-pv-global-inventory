@@ -15,7 +15,7 @@ from shapely import geometry
 from area import area
 
 # local
-from utils import *
+from solarpv.utils import *
 
 # ML
 import tensorflow as tf

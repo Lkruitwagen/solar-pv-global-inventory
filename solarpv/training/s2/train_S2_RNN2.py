@@ -13,7 +13,7 @@ from area import area
 import matplotlib.pyplot as plt
 
 # local
-from utils import *
+from solarpv.utils import *
 
 # ML
 import tensorflow as tf

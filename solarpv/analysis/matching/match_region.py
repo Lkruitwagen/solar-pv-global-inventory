@@ -329,17 +329,13 @@ class MatchRegion:
 
 
 if __name__=="__main__":
-    matcher=MatchRegion('wri')
-    matcher.run_main(['NA'], dist_buffer=4000, alpha=0.05,mipgap=0.002)
-    matcher.visualise()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dataset", help="specify the dataset to match against, one of ['eia','wri']", type=str)
+    parser.add_argument("--geography", help="specify a country geography with the iso-3166-1 2-letter code", type=str)
+    args = parser.parse_args()
 
-    for iso2 in matcher.ini_target_gdf['iso-3166-1'].unique():
-        logger.info(f'Running iso2: {iso2}')
+    if args.dataset and args.geography:
 
-        if iso2=="'NA":
-            print ('found namibia')
-
-        else:
-
-            matcher.run_main([iso2], dist_buffer=4000, alpha=0.05,mipgap=0.002)
-            matcher.visualise()
+        matcher=MatchRegion(args.dataset)
+        matcher.run_main(args.geography, dist_buffer=4000, alpha=0.05,mipgap=0.002)
+        matcher.visualise()
