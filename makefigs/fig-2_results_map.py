@@ -48,40 +48,29 @@ class Figure:
 
         logger.info(f'loading features...')
 
-        landcover_fts = json.load(open(os.path.join(os.getcwd(), 'data','ABCD_finalized.geojson'),'r'))['features']
+        gdf = gpd.read_file(os.path.join(os.getcwd(),'data','SPV_newmw.gpkg'))
 
         if make_arr:
-            records = []
-            for ft in landcover_fts:
-                rec = ft['properties']
-                pt = geometry.shape(ft['geometry']).representative_point()
-                rec['x'] = pt.x
-                rec['y'] = pt.y
-                records.append(rec)
+            gdf['pt'] = gdf.geometry.representative_point()
+            gdf['x'] = gdf['pt'].apply(lambda el: el.x)
+            gdf['y'] = gdf['pt'].apply(lambda el: el.y)
+
+
+
+        logger.info(f'mapping dates...')
+
+        gdf['install_date'] = gdf['install_date'].str.replace('<2016-06','2000-01-01')
+        gdf['install_date'] = gdf['install_date'].str.replace(',','')
+        gdf['install_date'] = gdf['install_date'].str[0:10]
+
+        gdf['dt_obj'] = pd.to_datetime(gdf['install_date'])
+
+
 
         if make_arr:
-            df = pd.DataFrame.from_records(records)
+            df = pd.DataFrame(gdf[['capacity_mw','area','iso-3166-1','dt_obj','lc_vis','x','y']])
         else:
-            df = pd.DataFrame.from_records([ft['properties'] for ft in landcover_fts])
-
-        print (list(df))
-
-        logger.info(f'mapping landcover to classes...')
-
-        df['install_date'] = df['install_date'].str.replace('<2016-06','2000-01-01')
-        df['install_date'] = df['install_date'].str.replace(',','')
-        df['install_date'] = df['install_date'].str[0:10]
-        print ('install_date')
-        print (df['install_date'].unique())
-        df['dt_obj'] = pd.to_datetime(df['install_date'])
-        print (df['dt_obj'])
-
-        
-
-        if make_arr:
-            df = df[['capacity_mw','area','iso-3166-1','dt_obj','x','y']]
-        else:
-            df = df[['capacity_mw','area','iso-3166-1','dt_obj']]
+            df = pd.DataFrame(gdf[['capacity_mw','area','iso-3166-1','dt_obj','lc_vis']])
 
 
         self.df = df[df.area>10^1]

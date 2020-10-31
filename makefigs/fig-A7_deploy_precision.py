@@ -8,15 +8,16 @@ import matplotlib as mpl
 import numpy as np
 from geopandas.plotting import plot_polygon_collection
 
+
 root = os.getcwd()
 
 ne = gpd.read_file(os.path.join(root,'data','ne_10m_countries.gpkg'))
 ne_prov = gpd.read_file(os.path.join(root,'data','ne_10m_admin_1_states_provinces.geojson'))
 
-ne['N_obs_SPOT'] = np.nan
-ne['N_T_SPOT'] = np.nan
-ne_prov['N_obs_SPOT'] = np.nan
-ne_prov['N_T_SPOT'] = np.nan
+#ne['N_obs_SPOT'] = np.nan
+#ne['N_T_SPOT'] = np.nan
+#ne_prov['N_obs_SPOT'] = np.nan
+#ne_prov['N_T_SPOT'] = np.nan
 
 ne_prov = ne_prov.set_index('iso_3166_2', drop=False)
 ne = ne.set_index('ISO_A2', drop=False)
@@ -29,11 +30,16 @@ SPOT_country_df = pd.read_csv(os.path.join(root,'data','ne_SPOT.csv')).set_index
 SPOT_prov_df = pd.read_csv(os.path.join(root,'data','ne_prov_SPOT.csv')).set_index('iso_3166_2')
 
 # do SPOT merging
-ne[['ISO_A2','N_obs_SPOT','N_T_SPOT']].to_csv(os.path.join(root,'data','ne_SPOT.csv'))
-ne_prov[['iso_3166_2','N_obs_SPOT','N_T_SPOT']].to_csv(os.path.join(root,'data','ne_prov_SPOT.csv'))
+#ne[['ISO_A2','N_obs_SPOT','N_T_SPOT']]
+#ne_prov[['iso_3166_2','N_obs_SPOT','N_T_SPOT']]
+
+#print (ne[['ISO_A2','N_obs_SPOT','N_T_SPOT']])
+#print (ne_prov[['iso_3166_2','N_obs_SPOT','N_T_SPOT']])
 
 ne = ne.merge(SPOT_country_df, how='left',left_index=True,right_index=True)
-ne_prov = ne_prov.merge(SPOT_prod_df, how='left',left_index=True,right_index=True)
+print ('ne',ne)
+ne_prov = ne_prov.merge(SPOT_prov_df, how='left',left_index=True,right_index=True)
+print ('ne_prov',ne_prov)
 ne['N_T_SPOT'] = ne['N_T_SPOT'].fillna(0)
 
 # do S2 merging
@@ -147,7 +153,7 @@ axs[0].set_yticks([])
 axs[1].set_ylim([-60,85])
 axs[1].set_xticks([])
 axs[1].set_yticks([])
-axs[0].set_title('(a)')
-axs[1].set_title('(b)')
+axs[0].set_title('(a) Sentinel-2')
+axs[1].set_title('(b) SPOT6/7')
 plt.savefig(os.path.join(root,'makefigs','figures','fig-A7_deploy_precision.png'))
 plt.show()

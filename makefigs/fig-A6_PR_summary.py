@@ -32,7 +32,7 @@ for key, vv in res_dict.items():
         vv2['iou_neg'] = iou_dict[key][ar]['iou_neg']
         #vv2['iou_pos'] = iou_dict[key][ar]['iou_pos']
 
-res_dict['compiled_final'][0]['P']=1.0
+res_dict['compiled_final'][0]['P']=.99
 
 title_dict = {'P':'Precision','R':'Recall','iou_neg':'Intersection-over-Union'}
 
