@@ -1,6 +1,6 @@
 import requests, json, os, logging, math
 
-DRIVE_IDS = json.load(open('./drive_ids.json','r'))
+
 
 def download_file_from_google_drive(_id, destination):
 
@@ -35,6 +35,7 @@ def download_file_from_google_drive(_id, destination):
     save_response_content(response, destination)
 
 def exists_or_download(fpath):
+    DRIVE_IDS = json.load(open('./drive_ids.json','r'))
     if os.path.exists(fpath):
         return fpath
     else:
@@ -241,3 +242,22 @@ def V_dir(point1, s, alpha1,miles=False):
     #print alpha2
     # short-circuit coincident points
     return (math.degrees(lat2),math.degrees(L2)),math.degrees(alpha2)
+
+def get_utm_zone(lat,lon):
+    """A function to grab the UTM zone number for any lat/lon location
+    """
+    zone_str = str(int((lon + 180)/6) + 1)
+
+    if ((lat>=56.) & (lat<64.) & (lon >=3.) & (lon <12.)):
+        zone_str = '32'
+    elif ((lat >= 72.) & (lat <84.)):
+        if ((lon >=0.) & (lon<9.)):
+            zone_str = '31'
+        elif ((lon >=9.) & (lon<21.)):
+            zone_str = '33'
+        elif ((lon >=21.) & (lon<33.)):
+            zone_str = '35'
+        elif ((lon >=33.) & (lon<42.)):
+            zone_str = '37'
+
+    return zone_str
