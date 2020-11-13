@@ -1,5 +1,5 @@
-# A Global Inventory of Utility-Scale Solar Photovoltaic Generating Stations
-Repository for machine learning and remote sensing pipeline described in Kruitwagen, L., Story, K., Friedrich, J., Byers, L., Skillman, S., & Hepburn, C. (2020) _A Global Inventory of Utility-Scale Solar Photovoltaic Generating Stations_. 
+# A Global Inventory of Commerical-, Industrial-, and Utility-Scale Photovoltaic Solar Generating Units
+Repository for machine learning and remote sensing pipeline described in Kruitwagen, L., Story, K., Friedrich, J., Byers, L., Skillman, S., & Hepburn, C. (2020) _A Global Inventory of Commerical-, Industrial-, and Utility-Scale Photovoltaic Solar Generating Units_. 
 
 # Project Summary
 
