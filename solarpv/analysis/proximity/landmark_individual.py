@@ -66,7 +66,7 @@ class Landmark:
     def get_batches(self,json_dir,done_dir, start_idx, end_idx, batch=1):
 
         self.done_dir = done_dir
-        gj_records = [{'idx':int(os.path.split(f)[-1].split('_')[0]),'f':f} for f in glob.glob(os.path.join(json_dir,'*.geojson'))]
+        gj_records = [{'idx':int(os.path.split(f)[-1].split('.')[0]),'f':f} for f in glob.glob(os.path.join(json_dir,'*.geojson'))]
         gj_records = sorted(gj_records, key=lambda rec: rec['idx'])
         done_idxs = [os.path.split(f)[-1].split('.')[0]  for f in glob.glob(os.path.join(done_dir,'*'))]
         gj_records = [r for r in gj_records if str(r['idx']) not in done_idxs]
@@ -313,6 +313,6 @@ if __name__ == '__main__':
 
     scraper = Landmark(virtual=True)
     #scraper._get_single(os.path.join(os.getcwd(),'data','landmark.json'))
-    json_dir = os.path.join(os.getcwd(),'data','landmark_mp','rerun')
-    done_dir = os.path.join(os.getcwd(),'data','landmark_results_mp','rerun')
+    json_dir = os.path.join(os.getcwd(),'data','landmark','do_individual')
+    done_dir = os.path.join(os.getcwd(),'data','landmark_results','do_individual')
     scraper.get_batches(json_dir,done_dir, args.start_idx, args.end_idx, batch=args.batch)
