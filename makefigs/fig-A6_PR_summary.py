@@ -23,18 +23,18 @@ def hex2rgb(h):
 
 root = os.getcwd()
 
-res_dict = pickle.load(open(os.path.join(root,'data','res_dict_gt10k.pickle'),'rb'))# open('../../data/res_dict.pkl','rb'))
-iou_dict = pickle.load(open(os.path.join(root,'data','iou_dict_gt10k.pickle'),'rb'))# open('../../data/iou_dict.pickle','rb'))
+res_dict = pickle.load(open(os.path.join(root,'data','res_dict_10k.pickle'),'rb'))# open('../../data/res_dict.pkl','rb'))
+iou_dict = pickle.load(open(os.path.join(root,'data','iou_dict_10k.pickle'),'rb'))# open('../../data/iou_dict.pickle','rb'))
 
 for key, vv in res_dict.items():
     for ar,vv2 in vv.items():
         vv2['iou'] = iou_dict[key][ar]['iou']
-        vv2['iou_neg'] = iou_dict[key][ar]['iou_neg']
+        #vv2['iou_neg'] = iou_dict[key][ar]['iou_neg']
         #vv2['iou_pos'] = iou_dict[key][ar]['iou_pos']
 
-res_dict['compiled_final'][0]['P']=.99
+del res_dict['pre-handlabel']
 
-title_dict = {'P':'Precision','R':'Recall','iou_neg':'Intersection-over-Union'}
+title_dict = {'P':'Precision','R':'Recall','iou':'Intersection-over-Union'}
 
 gg_colors = [tuple(ih/255 for ih in hex2rgb(ii['color'])) for ii in list(plt.rcParams['axes.prop_cycle'])[0:3]]
 
@@ -46,7 +46,7 @@ axs = axs.reshape((1,-1))
 
 for ii_a in range(len(area_bins)-1):
     
-    for ii_ax, M in enumerate(['P','R','iou_neg']):
+    for ii_ax, M in enumerate(['P','R','iou']):
         full_bars= [res_dict[kk][ii_a][M] for kk in res_dict.keys()] 
 
         bars = [full_bars[0]] + \
@@ -72,13 +72,16 @@ for ii_a in range(len(area_bins)-1):
         axs[ii_a,ii_ax].add_collection(line_segments)
 
         colors = [gg_colors[0]]*4 + [gg_colors[1]]*2 + [gg_colors[2]]
+        print (len(res_dict.keys()))
+        print (len(bars))
+        print (len(bottoms))
 
 
         axs[ii_a,ii_ax].bar(range(len(res_dict.keys())),bars, bottom=bottoms, edgecolor=colors, linewidth=2,color=colors)
         
         for ii in range(7):
             H=0.05
-            if ((M=='R' and ii_a==0) or (M=='iou_neg' and ii_a)):
+            if ((M=='R' and ii_a==0) or (M=='iou' and ii_a)):
                 H=.1
                 
             axs[ii_a,ii_ax].text(ii,H,f'{full_bars[ii]:.0%}', horizontalalignment='center')
