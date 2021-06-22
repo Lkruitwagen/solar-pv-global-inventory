@@ -55,7 +55,7 @@ class Figure:
 
         logger.info(f'loading features...')
 
-        gdf = gpd.read_file(os.path.join(os.getcwd(),'data','SPV_newmw.gpkg'))
+        gdf = gpd.read_file(os.path.join(os.getcwd(),'data','SPV_v5.gpkg'))
 
         if make_arr:
             gdf['pt'] = gdf.geometry.representative_point()
@@ -191,6 +191,7 @@ class Figure:
 
 
         df.set_index('dt_obj')[[cc+'_cumsum' for cc in self.classes]].clip(0).plot.area(ax=axs['capmw'], color=[self.colors_dict[kk] for kk in self.classes],legend=False, lw=0)
+        df.set_index('dt_obj')[[cc+'_cumsum' for cc in self.classes]].clip(0).to_csv(os.path.join(os.getcwd(),'makefigs','data','fig-3_global_ts.csv'))
 
         axs['capmw'].set_xticks([(dt.strptime('2016-06-01','%Y-%m-%d') + relativedelta(months=mm)) for mm in range(0,33,3)])
         axs['capmw'].set_xlabel('')
@@ -199,10 +200,15 @@ class Figure:
         axs['capmw'].set_xticklabels([str((dt.strptime('2016-06-01','%Y-%m-%d') + relativedelta(months=mm)))[0:7] for mm in range(0,33,3)])
 
  
-
+        hist_out = {}
         for col in self.classes:
             np.log10(df[df[col+'_orig']>0].capacity_mw *1000).hist(ax=axs['hist'], bins=np.log10(self.bins), alpha=0.75, edgecolor=self.colors_dict[col],histtype='step', linewidth=3,density=True, fill=False)
-        
+            fr,b = np.histogram(np.log10(df[df[col+'_orig']>0].capacity_mw * 1000), bins=np.log10(self.bins))
+            if not 'bins' in hist_out.keys():
+                hist_out['bins'] = b[:-1]
+            hist_out[col] = fr
+        pd.DataFrame(hist_out).to_csv(os.path.join(os.getcwd(),'makefigs','data','fig-3-global-hist.csv'))
+
         axs['hist'].grid(False)
         axs['hist'].set_yticks([])
         axs['hist'].set_xlabel('Est. Generating Capacity [$kW$]')
@@ -226,6 +232,7 @@ class Figure:
 
         print ('diff pv')
         print (diff)
+        diff.to_csv(os.path.join(os.getcwd(),'makefigs','data','fig-3-global-localskew.csv'))
 
         diff.plot.barh(ax=axs['local_skew'], color=[self.colors_dict[kk] for kk in self.classes])
         axs['local_skew'].axvline(0, color='k', lw=0.5)
@@ -244,6 +251,7 @@ class Figure:
 
         print ('diff pix')
         print (diff)
+        diff.to_csv(os.path.join(os.getcwd(),'makefigs','data','fig-3-global-globalskew.csv'))
 
         diff.plot.barh(ax=axs['global_skew'], color=[self.colors_dict[kk] for kk in self.classes])
         axs['global_skew'].axvline(0, color='k', lw=0.5)
@@ -375,6 +383,7 @@ class Figure:
 
 
             df_slice.set_index('dt_obj')[[cc+'_cumsum' for cc in self.classes]].clip(0).plot.area(ax=axs[country]['capmw'], color=[self.colors_dict[kk] for kk in self.classes],legend=False, lw=0)
+            df_slice.set_index('dt_obj')[[cc+'_cumsum' for cc in self.classes]].clip(0).to_csv(os.path.join(os.getcwd(),'makefigs','data',f'fig-A10-{country}-ts.csv'))
 
             #axs['scatter'].set_xticks([np.datetime64(dt.strptime('2016-06-01','%Y-%m-%d') + relativedelta(months=mm)).astype(np.int64)*1000 for mm in range(0,33,3)])
             axs[country]['capmw'].set_xticks([(dt.strptime('2016-06-01','%Y-%m-%d') + relativedelta(months=mm)) for mm in range(0,33,6)])
@@ -389,11 +398,17 @@ class Figure:
             
 
  
-
+            hist_out = {}
             for col in self.classes:
 
                 if (df_slice.loc[df_slice[col+'_orig']>0,'capacity_mw'].sum()/df_slice[self.classes].sum().sum())>0.05: # if its more than 5%
                     np.log10(df_slice[df_slice[col+'_orig']>0].capacity_mw *1000).hist(ax=axs[country]['hist'], bins=np.log10(self.bins), alpha=0.75, edgecolor=self.colors_dict[col],histtype='step', linewidth=3,density=True, fill=False)
+                    fr, b = np.histogram(np.log10(df_slice[df_slice[col+'_orig']>0].capacity_mw *1000), bins=np.log10(self.bins))
+                    if not 'bins' in hist_out.keys():
+                        hist_out['bins'] = b[:-1]
+                    hist_out[col] = fr
+
+            pd.DataFrame(hist_out).to_csv(os.path.join(os.getcwd(),'makefigs','data',f'fig-A10-{country}-hist.csv'))
 
 
             axs[country]['hist'].grid(False)
@@ -413,6 +428,8 @@ class Figure:
 
             diff = self.df_lcpv.loc[self.df_lcpv['iso2']==country,self.classes].sum()/tot_pv \
                     - self.df_lcpix.loc[self.df_lcpix['iso2']==country,self.classes].sum()/tot_pix 
+
+            diff.to_csv(os.path.join(os.getcwd(),'makefigs','data',f'fig-A10-{country}-localskew.csv'))
 
 
 
@@ -440,6 +457,8 @@ class Figure:
 
             diff =  self.df_lcpix.loc[self.df_lcpix['iso2']==country,self.classes].sum()/tot_pix \
                     - self.df_lcworld.loc[self.df_lcworld['ISO_A2']==country,self.classes].sum()/tot_world
+
+            diff.to_csv(os.path.join(os.getcwd(),'makefigs','data',f'fig-A10-{country}-globalskew.csv'))
 
             print (country, diff.max(), diff.min())
 
@@ -589,5 +608,5 @@ class Figure:
 if __name__=="__main__":
     generator=Figure(make_arr=False)
     #generator.make_arr()
-    #generator.make_global()
-    generator.make_regional()
+    generator.make_global()
+    #generator.make_regional()

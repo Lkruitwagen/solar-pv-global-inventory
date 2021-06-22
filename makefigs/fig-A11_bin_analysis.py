@@ -47,7 +47,7 @@ class Figure:
 
         logger.info(f'loading features...')
 
-        gdf = gpd.read_file(os.path.join(os.getcwd(),'data','SPV_newmw.gpkg'))
+        gdf = gpd.read_file(os.path.join(os.getcwd(),'data','SPV_v5.gpkg'))
 
 
         logger.info(f'mapping dates...')
@@ -120,13 +120,17 @@ class Figure:
             tot_world = self.df_lcworld[self.classes].sum().sum()
 
             self.df.loc[(self.df['capacity_mw']>=bin_bounds[0]) & (self.df['capacity_mw']<bin_bounds[1]),self.classes].cumsum().clip(0).plot.area(ax=axs[ii]['ts'], color=[self.colors_dict[kk] for kk in self.classes],legend=False, lw=0)
+            self.df.loc[(self.df['capacity_mw']>=bin_bounds[0]) & (self.df['capacity_mw']<bin_bounds[1]),self.classes].cumsum().clip(0).to_csv(os.path.join(os.getcwd(),'makefigs','data',f'fig-A11-{ii}-ts.csv'))
+
 
             diff = df_lcpv[self.classes].sum()/tot_pv - df_lcpix[self.classes].sum()/tot_pix 
+            diff.to_csv(os.path.join(os.getcwd(),'makefigs','data',f'fig-A11-{ii}-localskew.csv'))
 
             diff.plot.barh(ax=axs[ii]['local_skew'], color=[self.colors_dict[kk] for kk in self.classes])
 
             # get only pix that are in that bin csv
             diff =  df_lcpix[self.classes].sum()/tot_pix - self.df_lcworld[self.classes].sum()/tot_world
+            diff.to_csv(os.path.join(os.getcwd(),'makefigs','data',f'fig-A11-{ii}-globalskew.csv'))
 
             diff.plot.barh(ax=axs[ii]['global_skew'], color=[self.colors_dict[kk] for kk in self.classes])
 

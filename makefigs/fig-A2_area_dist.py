@@ -8,6 +8,7 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 from matplotlib.gridspec import GridSpec
 import os
+import pandas as pd
 
 root = os.getcwd()
 
@@ -43,6 +44,23 @@ np.log10(trn_polys['area']).hist(ax=axs['plot'], bins=10, alpha=0.75, edgecolor=
 np.log10(cv_polys['area']).hist(ax=axs['plot'], bins=10, alpha=0.75, edgecolor='k',histtype='step', linewidth=2,density=True, linestyle='--',fill=False)
 np.log10(test_polys['area']).hist(ax=axs['plot'], bins=10, alpha=0.75, edgecolor='k', histtype='step',linewidth=2, density=True, linestyle='-', fill=False)
 np.log10(gdf['area']).hist(ax=axs['plot'], bins=10, alpha=0.75, edgecolor='r',histtype='step', linewidth=2,density=True, linestyle='-',fill=False)
+
+hist_out = {}
+fr_trn, b_trn = np.histogram(np.log10(trn_polys['area']), bins=10)
+fr_cv, b_cv = np.histogram(np.log10(cv_polys['area']), bins=10)
+fr_test, b_test = np.histogram(np.log10(test_polys['area']), bins=10)
+fr_ours, b_ours = np.histogram(np.log10(gdf['area']), bins=10)
+
+hist_out['fr_trn'] = fr_trn
+hist_out['b_trn'] = b_trn[:-1]
+hist_out['fr_cv'] = fr_cv
+hist_out['b_cv'] = b_cv[:-1]
+hist_out['fr_test'] = fr_test
+hist_out['b_test'] = b_test[:-1]
+hist_out['fr_ours'] = fr_ours
+hist_out['b_ours'] = b_ours[:-1]
+pd.DataFrame(hist_out).to_csv(os.path.join(os.getcwd(),'makefigs','data','fig-A2.csv'))
+
 
 axs['plot'].grid(False)
 axs['plot'].set_yticks([])

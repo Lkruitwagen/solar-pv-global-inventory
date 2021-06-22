@@ -62,6 +62,9 @@ ne_prov['log10_obs_S2'] = np.log10(ne_prov['N_obs_S2'])
 ne_prov['log10_obs_SPOT'] = np.log10(ne_prov['N_obs_SPOT'])
 ne['log10_obs_SPOT'] = ne['log10_obs_SPOT'].fillna(0)
 
+ne[['por_S2','por_SPOT','N_obs_S2','N_obs_SPOT','N_T_S2','N_T_SPOT']].to_csv(os.path.join(os.getcwd(),'makefigs','data','fig-A7_country.csv'))
+ne_prov.loc[ne_prov['iso_a2'].isin(do_prov),['por_S2','por_SPOT','N_obs_S2','N_obs_SPOT','N_T_S2','N_T_SPOT']].to_csv(os.path.join(os.getcwd(),'makefigs','data','fig-A7_prov.csv'))
+
 vmax_S2=4
 vmax_SPOT=4.5
 por_max_S2 = 1

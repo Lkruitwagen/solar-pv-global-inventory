@@ -48,7 +48,8 @@ class Figure:
 
         logger.info(f'loading features...')
 
-        gdf = gpd.read_file(os.path.join(os.getcwd(),'data','SPV_newmw.gpkg'))
+        gdf = gpd.read_file(os.path.join(os.getcwd(),'data','SPV_v5.gpkg'))
+
 
         if make_arr:
             gdf['pt'] = gdf.geometry.representative_point()
@@ -249,6 +250,7 @@ class Figure:
         df_bar = pd.DataFrame.from_dict(records)
 
         print ('df bar',df_bar)
+        df_bar.to_csv(os.path.join(os.getcwd(),'makefigs','data','fig2.csv'))
 
         
 

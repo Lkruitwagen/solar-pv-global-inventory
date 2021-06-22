@@ -30,7 +30,7 @@ ne = gpd.read_file(os.path.join(root,'data','ne_10m_countries.gpkg'))
 ne = ne[~ne['geometry'].isna()]
 ne = ne.set_index('ISO_A2', drop=False)
 
-gdf = gpd.read_file(os.path.join(root,'data','SPV_newmw.gpkg'))
+gdf = gpd.read_file(os.path.join(root,'data','SPV_v5.gpkg'))
 df = pd.read_csv(os.path.join(root,'data','tabula-irena.csv')).set_index('iso2')
 df['2018'] = df['2018'].str.replace(' ','').astype(float)
 
@@ -78,6 +78,7 @@ ne = ne.merge(df[['2018']], left_index=True, right_index=True)
 #print (ne)
 
 ne = ne.sort_values('capacity_mw', ascending=False).iloc[0:90,:]
+ne[['2018','capacity_mw']].rename(columns={'2018':'IRENA_2018','capacity_mw':'ours_2018'}).to_csv(os.path.join(os.getcwd(),'makefigs','data','fig-A12.csv'))
 
 axs['base'].plot([0, 1], [0, 1], transform=axs['base'].transAxes, ls='--', c='gray',zorder=-1)
 #axs['adj'].plot([0, 1], [0, 1], transform=axs['adj'].transAxes, ls='--', c='gray')

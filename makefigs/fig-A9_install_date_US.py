@@ -3,11 +3,12 @@ import geopandas as gpd
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime as dt
+import numpy as np
 
 root=os.getcwd()
 
-match_files = glob.glob(os.path.join(root,'data','match_wri_*_4000_0.05*.gpkg'))
-match_files += glob.glob(os.path.join(root,'data','match_eia*.gpkg'))
+match_files = glob.glob(os.path.join(root,'data','matches','match_wri_*_4000_0.05*.gpkg'))
+match_files += glob.glob(os.path.join(root,'data','matches','match_eia*.gpkg'))
 match_files = [f for f in match_files if 'wri_US' not in f]
 
 match_df = gpd.GeoDataFrame(pd.concat([gpd.read_file(f) for f in match_files]))
@@ -18,6 +19,13 @@ gdf = gpd.read_file(os.path.join(root,'data','ABCD_landcover.geojson')) # for EI
 gdf = gdf.reset_index().rename(columns={'index':'unique_id'})
 
 gdf = gdf.merge(match_df[['unique_id','match_id']], how='left',left_on='unique_id',right_on='unique_id')
+
+gdf['install_date'] = gdf['install_date'].str.replace('<2016-06','2000-01-01')
+gdf['install_date'] = gdf['install_date'].str.replace(',','')
+gdf['install_date'] = gdf['install_date'].str[0:10]
+
+gdf['dt_obj'] = pd.to_datetime(gdf['install_date'])
+
 
 wri_df = pd.read_csv(os.path.join(root, 'data','WRI_gppd.csv'))
 eia_df = gpd.read_file(os.path.join(root,'data','eia_powerstations','PowerPlants_US_202001.shp'))
@@ -45,6 +53,7 @@ eia_df = eia_df.merge(eia_groupplant, how='left',left_on='Plant_Code',right_inde
 
 dated_slice = gdf.loc[(gdf['iso-3166-1']=='US')&(gdf['dt_obj']>dt.strptime('2016-06-01','%Y-%m-%d'))&(gdf['dt_obj']<dt.strptime('2018-12-31','%Y-%m-%d'))&(gdf['match_id']!=''),['dt_obj','match_id']]
 
+
 eia_df['Plant_Code'] = eia_df['Plant_Code'].astype(str)
 eia_df['plant_match'] = 'EIA'+eia_df['Plant_Code'].astype(str)
 
@@ -52,7 +61,14 @@ dated_slice = dated_slice.merge(eia_df[['plant_match','dt_ns']], how='left',left
 
 inds  = (dated_slice['dt_ns']>dt.strptime('2016-06-01','%Y-%m-%d')) & (dated_slice['dt_ns']<dt.strptime('2018-12-31','%Y-%m-%d'))
 
-dated_slice['dt_del'] = dated_slice.loc[inds,'dt_obj'] - dated_slice.loc[inds,'dt_ns']
+dated_slice.loc[inds, 'dt_del'] = dated_slice.loc[inds,'dt_obj'] - dated_slice.loc[inds,'dt_ns']
+
+fr, b = np.histogram(dated_slice.loc[inds,'dt_del'].dt.days.values, bins=20)
+hist_out = {
+	'fr':fr,
+	'b':b[:-1],
+}
+pd.DataFrame(hist_out).to_csv(os.path.join(os.getcwd(),'makefigs','data','fig-A9.csv'))
 
 fig, ax = plt.subplots(1,1,figsize=(6,6))
 dated_slice['dt_del'].dt.days.hist(bins=20, ax=ax, density=True, histtype='step',color='k', lw=3)
