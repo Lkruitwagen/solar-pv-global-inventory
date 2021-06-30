@@ -29,12 +29,9 @@ def hex2rgb(h):
 df_S2 = pd.read_csv(os.path.join(os.getcwd(),'data','band_perturbation','band_perturbation_S2.csv')).sort_values('records').set_index(['records','bands'])
 df_SPOT = pd.read_csv(os.path.join(os.getcwd(),'data','band_perturbation','band_perturbation_SPOT.csv'))
 
+root = os.getcwd()
 
 # prep SPOT df
-
-
-
-
 idx = pd.IndexSlice
 
 #all_bands = list(df.index.get_level_values(1).unique())
@@ -94,10 +91,25 @@ axs['S2'] = {'bdo':fig.add_subplot(gs[0,0:7]),
 axs['SPOT'] = {'bdo':fig.add_subplot(gs[0,7:]),
                 'additive':fig.add_subplot(gs[1,7:]),
                 'multiplicative':fig.add_subplot(gs[2,7:])}
+
+data_out = {}
+
 # do band dropout
 data = []
 for ii_b, band in enumerate(S2_bands):
     data.append(df_S2.loc[idx[:,band['name']],'band_dropout'].values.clip(-1,1))
+    el = df_S2.loc[idx[:,band['name']],'band_dropout'].values.clip(-1,1)
+    print ('band')
+    print (band)
+    data_out[band['name']] = {
+        'mean':el.mean(),
+        'Q20':np.percentile(el,20),
+        'Q80':np.percentile(el,80),
+        'min':el.min(),
+        'max':el.max(),
+    }
+    df_out = pd.DataFrame(data_out)
+    df_out.to_csv(os.path.join(root,'makefigs','data','fig-A8_S2_bands.csv'))
 
 bplot0S2 = axs['S2']['bdo'].boxplot(data, whis='range',patch_artist=True, medianprops = dict(linestyle='-', linewidth=1, color='firebrick'))
 axs['S2']['bdo'].set_ylabel('IoU Impairment')
@@ -107,8 +119,19 @@ axs['S2']['bdo'].set_xticklabels([])
 axs['S2']['bdo'].yaxis.set_major_formatter(mtick.PercentFormatter(1))
 
 data = []
+data_out = {}
 for ii_b, band in enumerate(SPOT_bands):
     data.append(df_SPOT[band['name']+'_bdo'].values.clip(-1,1))
+    el = df_SPOT[band['name']+'_bdo'].values.clip(-1,1)
+    data_out[band['name']] = {
+        'mean':el.mean(),
+        'Q20':np.percentile(el,20),
+        'Q80':np.percentile(el,80),
+        'min':el.min(),
+        'max':el.max()
+    }
+    df_out = pd.DataFrame(data_out)
+    df_out.to_csv(os.path.join(root,'makefigs','data','fig-A8_SPOT_bands.csv'))
 
 bplot0SPOT = axs['SPOT']['bdo'].boxplot(data, whis='range',patch_artist=True, medianprops = dict(linestyle='-', linewidth=1, color='firebrick'))
 #axs['SPOT']['bdo'].set_ylabel('IoU Impairment')
@@ -121,11 +144,25 @@ axs['SPOT']['bdo'].set_yticklabels([])
 # do additive 1,2,3
 data = []
 positions=[]
+data_out = {}
 for ii_b, band in enumerate(S2_bands):
     data.append(df_S2.loc[idx[:,band['name']],'additive_0.1'].values.clip(-1,1))
     data.append(df_S2.loc[idx[:,band['name']],'additive_0.2'].values.clip(-1,1))
     data.append(df_S2.loc[idx[:,band['name']],'additive_0.3'].values.clip(-1,1))
     positions += [(ii_b+1 + (ii_p-1)/4) for ii_p in range(3)]
+    el1 = df_S2.loc[idx[:,band['name']],'additive_0.1'].values.clip(-1,1)
+    el2 = df_S2.loc[idx[:,band['name']],'additive_0.2'].values.clip(-1,1)
+    el3 = df_S2.loc[idx[:,band['name']],'additive_0.3'].values.clip(-1,1)
+    for el, label in zip([el1,el2,el3],['_additive_0.1','_additive_0.2','_additive_0.3']):
+        data_out[band['name']+label] = {
+            'mean':el.mean(),
+            'Q20':np.percentile(el,20),
+            'Q80':np.percentile(el,80),
+            'min':el.min(),
+            'max':el.max()
+        }
+    df_out = pd.DataFrame(data_out)
+    df_out.to_csv(os.path.join(root,'makefigs','data','fig-A8_S2_additive.csv'))
 
 bplot1S2 = axs['S2']['additive'].boxplot(data, positions=positions, whis='range', widths=0.15, patch_artist=True, medianprops = dict(linestyle='-', linewidth=1, color='firebrick'))
 axs['S2']['additive'].set_ylabel('IoU Impairment')
@@ -137,11 +174,25 @@ axs['S2']['additive'].yaxis.set_major_formatter(mtick.PercentFormatter(1))
 
 data = []
 positions=[]
+data_out = {}
 for ii_b, band in enumerate(SPOT_bands):
     data.append(df_SPOT[band['name']+'_additive_0.1'].values.clip(-1,1))
     data.append(df_SPOT[band['name']+'_additive_0.2'].values.clip(-1,1))
     data.append(df_SPOT[band['name']+'_additive_0.3'].values.clip(-1,1))
     positions += [(ii_b+1 + (ii_p-1)/4) for ii_p in range(3)]
+    el1 = df_SPOT[band['name']+'_additive_0.1'].values.clip(-1,1)
+    el2 = df_SPOT[band['name']+'_additive_0.2'].values.clip(-1,1)
+    el3 = df_SPOT[band['name']+'_additive_0.3'].values.clip(-1,1)
+    for el, label in zip([el1,el2,el3],['_additive_0.1','_additive_0.2','_additive_0.3']):
+        data_out[band['name']+label] = {
+            'mean':el.mean(),
+            'Q20':np.percentile(el,20),
+            'Q80':np.percentile(el,80),
+            'min':el.min(),
+            'max':el.max()
+        }
+    df_out = pd.DataFrame(data_out)
+    df_out.to_csv(os.path.join(root,'makefigs','data','fig-A8_SPOT_additive.csv'))
 
 bplot1SPOT = axs['SPOT']['additive'].boxplot(data, positions=positions, whis='range', widths=0.15, patch_artist=True, medianprops = dict(linestyle='-', linewidth=1, color='firebrick'))
 axs['SPOT']['additive'].set_title('SPOT6/7')
@@ -156,11 +207,27 @@ axs['SPOT']['additive'].set_yticklabels([])
 # do multiplicative 1,2,3
 data = []
 positions=[]
+data_out = {}
 for ii_b, band in enumerate(S2_bands):
     data.append(df_S2.loc[idx[:,band['name']],'multiplicative_0.1'].values.clip(-1,1))
     data.append(df_S2.loc[idx[:,band['name']],'multiplicative_0.2'].values.clip(-1,1))
     data.append(df_S2.loc[idx[:,band['name']],'multiplicative_0.3'].values.clip(-1,1))
     positions += [(ii_b+1 + (ii_p-1)/4) for ii_p in range(3)]
+    el1 = df_S2.loc[idx[:,band['name']],'multiplicative_0.1'].values.clip(-1,1)
+    el2 = df_S2.loc[idx[:,band['name']],'multiplicative_0.2'].values.clip(-1,1)
+    el3 = df_S2.loc[idx[:,band['name']],'multiplicative_0.3'].values.clip(-1,1)
+    for el, label in zip([el1,el2,el3],['_multiplicative_0.1','_multiplicative_0.2','_multiplicative_0.3']):
+        data_out[band['name']+label] = {
+            'mean':el.mean(),
+            'Q20':np.percentile(el,20),
+            'Q80':np.percentile(el,80),
+            'min':el.min(),
+            'max':el.max()
+        }
+    df_out = pd.DataFrame(data_out)
+    df_out.to_csv(os.path.join(root,'makefigs','data','fig-A8_S2_multiplicative.csv'))
+    
+    
 
 bplot2S2 = axs['S2']['multiplicative'].boxplot(data, positions=positions, whis='range', widths=0.15,patch_artist=True, medianprops = dict(linestyle='-', linewidth=1, color='firebrick'))
 axs['S2']['multiplicative'].set_xticks(range(1,15))
@@ -173,12 +240,26 @@ axs['S2']['multiplicative'].yaxis.set_major_formatter(mtick.PercentFormatter(1.)
 
 data = []
 positions=[]
-
+data_out = {}
 for ii_b, band in enumerate(SPOT_bands):
     data.append(df_SPOT[band['name']+'_multiplicative_0.1'].values.clip(-1,1))
     data.append(df_SPOT[band['name']+'_multiplicative_0.2'].values.clip(-1,1))
     data.append(df_SPOT[band['name']+'_multiplicative_0.3'].values.clip(-1,1))
     positions += [(ii_b+1 + (ii_p-1)/4) for ii_p in range(3)]
+    el1 = df_SPOT[band['name']+'_multiplicative_0.1'].values.clip(-1,1)
+    el2 = df_SPOT[band['name']+'_multiplicative_0.2'].values.clip(-1,1)
+    el3 = df_SPOT[band['name']+'_multiplicative_0.3'].values.clip(-1,1)
+    for el, label in zip([el1,el2,el3],['_multiplicative_0.1','_multiplicative_0.2','_multiplicative_0.3']):
+        data_out[band['name']+label] = {
+            'mean':el.mean(),
+            'Q20':np.percentile(el,20),
+            'Q80':np.percentile(el,80),
+            'min':el.min(),
+            'max':el.max()
+        }
+    df_out = pd.DataFrame(data_out)
+    df_out.to_csv(os.path.join(root,'makefigs','data','fig-A8_SPOT_multiplicative.csv'))
+    
 
 bplot2SPOT = axs['SPOT']['multiplicative'].boxplot(data, positions=positions, whis='range', widths=0.15,patch_artist=True, medianprops = dict(linestyle='-', linewidth=1, color='firebrick'))
 axs['SPOT']['multiplicative'].set_xticks(range(1,5))
