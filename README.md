@@ -1,5 +1,5 @@
 # A Global Inventory of Commerical-, Industrial-, and Utility-Scale Photovoltaic Solar Generating Units
-Repository for machine learning and remote sensing pipeline described in Kruitwagen, L., Story, K., Friedrich, J., Byers, L., Skillman, S., & Hepburn, C. (2020) _A Global Inventory of Commerical-, Industrial-, and Utility-Scale Photovoltaic Solar Generating Units_. 
+Repository for machine learning and remote sensing pipeline described in [Kruitwagen, L., Story, K., Friedrich, J., Byers, L., Skillman, S., & Hepburn, C. (2021) A global inventory of photovoltaic solar energy generating units, _Nature_ **598**, 604–610](https://www.nature.com/articles/s41586-021-03957-7). 
 
 # Project Summary
 
