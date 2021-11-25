@@ -44,9 +44,9 @@ Photovoltaic (PV) solar energy generating capacity has grown by 41\% per year si
 
 Recognising the fundamental public-goods nature of asset-level data and its importance in the urgent mitigation of climate change, we make our dataset publicly available.
 
-The complete dataset can be downloaded from the World Resources Institute [Link forthcoming].
+The complete dataset can be downloaded from the [Zenodo data repository](https://zenodo.org/record/5005868).
 
-An interactive visualisation of our dataset is available [here](https://lucaskruitwagen.users.earthengine.app/view/solarpvdemo).
+An interactive visualisation of our dataset is from the World Resources Institute [here](https://resourcewatch.org/data/explore/ene032-Solar-Plants_1).
 
 ## Acknowledgements
 
@@ -169,9 +169,7 @@ Matching installations to existing data uses a mixed integer linear program spec
 
 ## Data
 
-Our dataset is available to download from the [World Resources Institute], of can be found [here](https://drive.google.com/file/d/127mYGPll9jacX_58JNcJaKYagN74-qpp/view?usp=sharing).
-
-All other data used in pipeline preparation, deployment, analaysis, and visualisation is available [here](). This archive must be downloaded and extracted into a `data/` folder in the root directory of the repository.
+All data, including training, validation, test, and predicted datasets, is available to download from the [Zenodo repository](https://zenodo.org/record/5005868). An interactive visualisation is also offered by the [World Resources Institute ResourceWatch](https://resourcewatch.org/data/explore/ene032-Solar-Plants).
 
 ## Workflows
 
